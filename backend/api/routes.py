@@ -1,7 +1,5 @@
 """
-routes.py
-─────────
-FastAPI SSE endpoint.
+routes.py — FastAPI SSE endpoint
 Runs the LangGraph graph and streams AgentEvents to the frontend.
 """
 import json
@@ -24,16 +22,12 @@ NODE_AGENT_MAP = {
 def sse(event: AgentEvent) -> str:
     return f"data: {json.dumps(event.model_dump())}\n\n"
 
-def sse_raw(data: dict) -> str:
-    return f"data: {json.dumps(data)}\n\n"
-
 
 async def stream_graph(req: ResearchRequest):
     api_key = req.api_key or GEMINI_API_KEY
-    start = time.time()
+    start   = time.time()
 
-    # Signal pipeline start
-    yield sse(AgentEvent(agent="system", type="status", message="started"))
+    yield sse(AgentEvent(agent="system",     type="status", message="started"))
     yield sse(AgentEvent(agent="supervisor", type="status", message="active"))
     yield sse(AgentEvent(agent="supervisor", type="log",
                          message=f'Query received: "{req.query}"'))
@@ -45,17 +39,27 @@ async def stream_graph(req: ResearchRequest):
             max_iterations=req.max_iterations or 3,
         )
 
-        last_node = None
+        last_node    = None
+        # Accumulate state fields from every node update
+        accumulated  = init_state.model_dump()
 
-        # Stream node-by-node via LangGraph's astream
         async for step in graph.astream(init_state, stream_mode="updates"):
             for node_name, node_output in step.items():
                 agent = NODE_AGENT_MAP.get(node_name, "system")
 
-                # Transition: mark previous node done, activate new one
+                # Merge node output into accumulated state
+                for k, v in node_output.items():
+                    if k == "events":
+                        accumulated.setdefault("events", [])
+                        accumulated["events"] = accumulated["events"] + (v or [])
+                    else:
+                        accumulated[k] = v
+
+                # Animate arrow transition between nodes
                 if last_node and last_node != node_name:
-                    yield sse(AgentEvent(agent=NODE_AGENT_MAP.get(last_node, "system"),
-                                         type="status", message="done"))
+                    yield sse(AgentEvent(
+                        agent=NODE_AGENT_MAP.get(last_node, "system"),
+                        type="status", message="done"))
                     yield sse(AgentEvent(agent="supervisor", type="status", message="active"))
                     yield sse(AgentEvent(agent="supervisor", type="log",
                                          message=f"Routing: {last_node} → {node_name}"))
@@ -63,7 +67,7 @@ async def stream_graph(req: ResearchRequest):
 
                 yield sse(AgentEvent(agent=agent, type="status", message="active"))
 
-                # Drain the event queue this node produced
+                # Drain events this node emitted
                 for evt in node_output.get("events", []):
                     yield sse(AgentEvent(
                         agent=evt.get("agent", agent),
@@ -73,7 +77,7 @@ async def stream_graph(req: ResearchRequest):
                         data=evt.get("data"),
                     ))
 
-                # Emit metrics after each node
+                # Per-node metrics
                 iteration = node_output.get("iteration", 0)
                 tokens    = node_output.get("total_tokens", 0)
                 if iteration:
@@ -83,58 +87,54 @@ async def stream_graph(req: ResearchRequest):
                     yield sse(AgentEvent(agent="system", type="metric", message="",
                                          data={"tokens": tokens}))
 
-                # Emit critic score for the UI score ring
+                # Critic score ring
                 if node_name == "critic":
                     score   = node_output.get("quality_score", 0)
                     approve = node_output.get("approved", False)
+                    iter_n  = accumulated.get("iteration", 1)
                     yield sse(AgentEvent(agent="critic", type="score", message="",
                                          data={"score": score, "approve": approve,
-                                               "iteration": node_output.get("iteration", 1)}))
+                                               "iteration": iter_n}))
 
                 last_node = node_name
 
-        # Mark writer done and emit final report
+        # Mark final node done
         if last_node:
-            yield sse(AgentEvent(agent=NODE_AGENT_MAP.get(last_node, "system"),
-                                  type="status", message="done"))
-
-        # Get final state
-        final = await graph.ainvoke(init_state) if False else None  # already ran above
+            yield sse(AgentEvent(
+                agent=NODE_AGENT_MAP.get(last_node, "system"),
+                type="status", message="done",
+                data={"label": "report ready" if last_node == "writer" else "done"}))
 
     except Exception as e:
         yield sse(AgentEvent(agent="system", type="log", message=f"Graph error: {e}"))
         yield "data: [DONE]\n\n"
         return
 
-    # We need to re-run to get final state — instead collect it from stream
-    # Re-run cleanly to get final_report (LangGraph streams don't expose final state easily)
-    try:
-        graph2 = build_graph(api_key)
-        final_state = await graph2.ainvoke(ResearchState(
-            query=req.query,
-            max_iterations=req.max_iterations or 3,
-        ))
-    except Exception as e:
-        yield sse(AgentEvent(agent="system", type="log", message=f"Final state error: {e}"))
-        yield "data: [DONE]\n\n"
-        return
+    # Build final summary from accumulated state dict (no .attribute access on AddableValuesDict)
+    elapsed       = round(time.time() - start, 1)
+    total_tokens  = accumulated.get("total_tokens", 0)
+    iteration     = accumulated.get("iteration", 1)
+    quality_score = accumulated.get("quality_score", 0)
+    final_report  = accumulated.get("final_report", "")
+    topic         = accumulated.get("topic", req.query)
 
-    elapsed = round(time.time() - start, 1)
+    yield sse(AgentEvent(agent="supervisor", type="status", message="active"))
     yield sse(AgentEvent(agent="supervisor", type="log",
-                          message=f"✓ Pipeline complete — {final_state.iteration} iteration(s) · "
-                                  f"{final_state.total_tokens} tokens · {elapsed}s"))
+                          message=f"✓ Pipeline complete — {iteration} iteration(s) · "
+                                  f"{total_tokens} tokens · {elapsed}s"))
     yield sse(AgentEvent(agent="supervisor", type="status", message="done",
                           data={"label": "complete"}))
     yield sse(AgentEvent(agent="system", type="metric", message="",
-                          data={"tokens": final_state.total_tokens, "elapsed": elapsed}))
+                          data={"tokens": total_tokens, "elapsed": elapsed}))
+
     yield sse(AgentEvent(agent="writer", type="result", message="",
                           data={
-                              "topic":           final_state.topic,
-                              "report":          final_state.final_report,
-                              "iterations":      final_state.iteration,
-                              "total_tokens":    final_state.total_tokens,
+                              "topic":           topic,
+                              "report":          final_report,
+                              "iterations":      iteration,
+                              "total_tokens":    total_tokens,
                               "elapsed_seconds": elapsed,
-                              "quality_score":   final_state.quality_score,
+                              "quality_score":   quality_score,
                           }))
     yield "data: [DONE]\n\n"
 
@@ -151,4 +151,4 @@ async def research_stream(req: ResearchRequest):
 
 @router.get("/health")
 async def health():
-    return {"status": "ok", "service": "research-orchestrator", "framework": "LangGraph 0.4"}
+    return {"status": "ok", "service": "research-orchestrator", "framework": "LangGraph 0.2"}
