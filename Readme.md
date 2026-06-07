@@ -108,7 +108,7 @@ cd research_orchestrator_langchain
 
 **2. install — use uv, it's faster**
 ```bash
-brew install uv                          # if you don't have it
+brew install uv                          
 uv venv .venv --python 3.12
 source .venv/bin/activate
 uv pip install -r requirements.txt

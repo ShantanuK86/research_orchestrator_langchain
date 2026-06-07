@@ -1,259 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Research Orchestrator — LangGraph Multi-Agent System</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Orchestrator — LangGraph Multi-Agent System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<header>
-  <a class="logo" href="#">
-    <div class="logo-mark"></div>
-    <span class="logo-text">research<span>.</span>orchestrator</span>
-  </a>
-  <div class="header-right">
-    <span class="badge-header">LangGraph + LangChain</span>
-    <a class="github-link" href="https://github.com/shantanukumar/research-orchestrator" target="_blank">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
-      github
+  <header>
+    <a class="logo" href="#">
+      <div class="logo-mark"></div>
+      <span class="logo-text">research<span>.</span>orchestrator</span>
     </a>
-  </div>
-</header>
-
-<section class="hero">
-  <div class="hero-tag"><span class="live-dot"></span>LangGraph Multi-Agent Pipeline</div>
-  <h1>RESEARCH<br><span class="accent">ORCHESTRATOR</span></h1>
-  <p class="hero-sub">A real LangGraph StateGraph — Supervisor, Search, Critic, and Writer nodes with conditional routing, iterative refinement, and live SSE observability.</p>
-  <div class="tech-strip">
-    <span class="tech-badge active">⬡ LangGraph StateGraph</span>
-    <span class="tech-badge active">⛓ LangChain LCEL</span>
-    <span class="tech-badge active">✦ Gemini 2.0 Flash</span>
-    <span class="tech-badge">⚡ FastAPI SSE</span>
-    <span class="tech-badge">⬡ Conditional Edges</span>
-    <span class="tech-badge">↺ Critic Loop</span>
-  </div>
-</section>
-
-<section class="input-section">
-  <div class="query-wrapper">
-    <div class="query-top">
-      <span class="query-icon">⬡</span>
-      <textarea id="query" rows="2" placeholder="Enter a research topic... e.g. 'How LangGraph changes production AI agent design'"></textarea>
+    <div class="header-right">
+      <span class="badge-header">LangGraph + LangChain</span>
+      <a class="github-link" href="https://github.com/shantanukumar/research-orchestrator" target="_blank">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+        </svg>
+        github
+      </a>
     </div>
-    <div class="query-bottom">
-      <div class="query-hints">
-        <span class="hint-chip" onclick="setQuery('Future of multi-agent AI systems in 2026')">multi-agent AI 2026</span>
-        <span class="hint-chip" onclick="setQuery('LangGraph vs AutoGen for production agents')">LangGraph vs AutoGen</span>
-        <span class="hint-chip" onclick="setQuery('MCP protocol impact on AI tooling ecosystem')">MCP ecosystem</span>
-        <span class="hint-chip" onclick="setQuery('RAG pipelines best practices enterprise 2025')">RAG best practices</span>
-      </div>
-      <button class="run-btn" id="runBtn" onclick="runOrchestration()">
-        <span>▶</span> Run Agents
-      </button>
+  </header>
+
+  <section class="hero">
+    <div class="hero-tag"><span class="live-dot"></span>LangGraph Multi-Agent Pipeline</div>
+    <h1>RESEARCH<br><span class="accent">ORCHESTRATOR</span></h1>
+    <p class="hero-sub">A real LangGraph StateGraph — Supervisor, Search, Critic, and Writer nodes with conditional
+      routing, iterative refinement, and live SSE observability.</p>
+    <div class="tech-strip">
+      <span class="tech-badge active">⬡ LangGraph StateGraph</span>
+      <span class="tech-badge active">⛓ LangChain LCEL</span>
+      <span class="tech-badge active">✦ Gemini</span>
+      <span class="tech-badge">⚡ FastAPI SSE</span>
+      <span class="tech-badge">⬡ Conditional Edges</span>
+      <span class="tech-badge">↺ Critic Loop</span>
     </div>
-  </div>
-  <div class="api-key-row">
-    <label>GEMINI API KEY</label>
-    <input type="password" id="apikey" placeholder="AIza... — free at aistudio.google.com">
-  </div>
-</section>
+  </section>
 
-<!-- ── MAIN PANEL ── -->
-<div class="main" id="mainPanel">
-
-  <!-- LangGraph visualizer -->
-  <div class="graph-section">
-    <div class="section-label">langgraph state graph</div>
-    <div class="graph-canvas">
-
-      <div class="graph-nodes">
-
-        <!-- Supervisor node -->
-        <div class="gnode" id="node-supervisor" style="--nc:var(--supervisor)">
-          <div class="gnode-icon">🧠</div>
-          <div class="gnode-pulse"></div>
-          <div class="gnode-name">SUPERVISOR</div>
-          <div class="gnode-role">Builds research plan,<br>routes to sub-agents</div>
-          <span class="gnode-status" id="status-supervisor">idle</span>
-          <div class="gnode-iter" id="iter-supervisor"></div>
-        </div>
-
-        <!-- Arrow 0 -->
-        <div class="graph-arrow">
-          <div class="arrow-line" id="arrow-0"></div>
-          <div class="arrow-label">dispatch</div>
-        </div>
-
-        <!-- Search node -->
-        <div class="gnode" id="node-search" style="--nc:var(--search)">
-          <div class="gnode-icon">🔍</div>
-          <div class="gnode-pulse"></div>
-          <div class="gnode-name">SEARCH</div>
-          <div class="gnode-role">Synthesizes knowledge<br>across research angles</div>
-          <span class="gnode-status" id="status-search">idle</span>
-          <div class="gnode-iter" id="iter-search"></div>
-        </div>
-
-        <!-- Arrow 1 -->
-        <div class="graph-arrow">
-          <div class="arrow-line" id="arrow-1"></div>
-          <div class="arrow-label">evaluate</div>
-        </div>
-
-        <!-- Critic node -->
-        <div class="gnode" id="node-critic" style="--nc:var(--critic)">
-          <div class="gnode-icon">🔬</div>
-          <div class="gnode-pulse"></div>
-          <div class="gnode-name">CRITIC</div>
-          <div class="gnode-role">Scores 0–10, approves<br>or loops with gaps</div>
-          <span class="gnode-status" id="status-critic">idle</span>
-          <div class="gnode-iter" id="iter-critic"></div>
-          <!-- Score rings live here -->
-          <div class="score-rings" id="scoreRings"></div>
-        </div>
-
-        <!-- Arrow 2 -->
-        <div class="graph-arrow">
-          <div class="arrow-line" id="arrow-2"></div>
-          <div class="arrow-label">approved</div>
-        </div>
-
-        <!-- Writer node -->
-        <div class="gnode" id="node-writer" style="--nc:var(--writer)">
-          <div class="gnode-icon">✍️</div>
-          <div class="gnode-pulse"></div>
-          <div class="gnode-name">WRITER</div>
-          <div class="gnode-role">Synthesizes final<br>structured report</div>
-          <span class="gnode-status" id="status-writer">idle</span>
-          <div class="gnode-iter" id="iter-writer"></div>
-        </div>
-
+  <section class="input-section">
+    <div class="query-wrapper">
+      <div class="query-top">
+        <span class="query-icon">⬡</span>
+        <textarea id="query" rows="2"
+          placeholder="Enter a research topic... e.g. 'How LangGraph changes production AI agent design'"></textarea>
       </div>
-
-      <!-- Loop-back indicator -->
-      <div class="loop-indicator" id="loopIndicator">
-        <span class="loop-arrow-curved">↺</span>
-        <span class="loop-text">Critic rejected → looping</span>
-        <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">conditional_edge → search</span>
+      <div class="query-bottom">
+        <div class="query-hints">
+          <span class="hint-chip" onclick="setQuery('Future of multi-agent AI systems in 2026')">multi-agent AI
+            2026</span>
+          <span class="hint-chip" onclick="setQuery('LangGraph vs AutoGen for production agents')">LangGraph vs
+            AutoGen</span>
+          <span class="hint-chip" onclick="setQuery('MCP protocol impact on AI tooling ecosystem')">MCP ecosystem</span>
+          <span class="hint-chip" onclick="setQuery('RAG pipelines best practices enterprise 2025')">RAG best
+            practices</span>
+        </div>
+        <button class="run-btn" id="runBtn" onclick="runOrchestration()">
+          <span>▶</span> Run Agents
+        </button>
       </div>
-
     </div>
-  </div>
+    <div class="api-key-row">
+      <label>GEMINI API KEY</label>
+      <input type="password" id="apikey" placeholder="AIza... — free at aistudio.google.com">
+    </div>
+  </section>
 
-  <div class="two-col">
+  <!-- ── MAIN PANEL ── -->
+  <div class="main" id="mainPanel">
 
-    <!-- Agent log -->
-    <div class="agent-log">
-      <div class="log-header">
-        <div class="log-title">
-          <span class="log-live"></span>
-          agent communication log
+    <!-- LangGraph visualizer -->
+    <div class="graph-section">
+      <div class="section-label">langgraph state graph</div>
+      <div class="graph-canvas">
+
+        <div class="graph-nodes">
+
+          <!-- Supervisor node -->
+          <div class="gnode" id="node-supervisor" style="--nc:var(--supervisor)">
+            <div class="gnode-icon">🧠</div>
+            <div class="gnode-pulse"></div>
+            <div class="gnode-name">SUPERVISOR</div>
+            <div class="gnode-role">Builds research plan,<br>routes to sub-agents</div>
+            <span class="gnode-status" id="status-supervisor">idle</span>
+            <div class="gnode-iter" id="iter-supervisor"></div>
+          </div>
+
+          <!-- Arrow 0 -->
+          <div class="graph-arrow">
+            <div class="arrow-line" id="arrow-0"></div>
+            <div class="arrow-label">dispatch</div>
+          </div>
+
+          <!-- Search node -->
+          <div class="gnode" id="node-search" style="--nc:var(--search)">
+            <div class="gnode-icon">🔍</div>
+            <div class="gnode-pulse"></div>
+            <div class="gnode-name">SEARCH</div>
+            <div class="gnode-role">Synthesizes knowledge<br>across research angles</div>
+            <span class="gnode-status" id="status-search">idle</span>
+            <div class="gnode-iter" id="iter-search"></div>
+          </div>
+
+          <!-- Arrow 1 -->
+          <div class="graph-arrow">
+            <div class="arrow-line" id="arrow-1"></div>
+            <div class="arrow-label">evaluate</div>
+          </div>
+
+          <!-- Critic node -->
+          <div class="gnode" id="node-critic" style="--nc:var(--critic)">
+            <div class="gnode-icon">🔬</div>
+            <div class="gnode-pulse"></div>
+            <div class="gnode-name">CRITIC</div>
+            <div class="gnode-role">Scores 0–10, approves<br>or loops with gaps</div>
+            <span class="gnode-status" id="status-critic">idle</span>
+            <div class="gnode-iter" id="iter-critic"></div>
+            <!-- Score rings live here -->
+            <div class="score-rings" id="scoreRings"></div>
+          </div>
+
+          <!-- Arrow 2 -->
+          <div class="graph-arrow">
+            <div class="arrow-line" id="arrow-2"></div>
+            <div class="arrow-label">approved</div>
+          </div>
+
+          <!-- Writer node -->
+          <div class="gnode" id="node-writer" style="--nc:var(--writer)">
+            <div class="gnode-icon">✍️</div>
+            <div class="gnode-pulse"></div>
+            <div class="gnode-name">WRITER</div>
+            <div class="gnode-role">Synthesizes final<br>structured report</div>
+            <span class="gnode-status" id="status-writer">idle</span>
+            <div class="gnode-iter" id="iter-writer"></div>
+          </div>
+
         </div>
-        <span class="log-count" id="logCount">0 events</span>
+
+        <!-- Loop-back indicator -->
+        <div class="loop-indicator" id="loopIndicator">
+          <span class="loop-arrow-curved">↺</span>
+          <span class="loop-text">Critic rejected → looping</span>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">conditional_edge → search</span>
+        </div>
+
       </div>
-      <div class="log-body" id="logBody"></div>
     </div>
 
-    <!-- Side panel -->
-    <div class="side-panel">
+    <div class="two-col">
 
-      <div class="info-card">
-        <div class="info-card-header">run metrics</div>
-        <div class="info-card-body">
-          <div class="stats-grid">
-            <div class="stat-item"><div class="stat-num" id="metricIterations">0</div><div class="stat-label">iterations</div></div>
-            <div class="stat-item"><div class="stat-num" id="metricTime">0s</div><div class="stat-label">elapsed</div></div>
-            <div class="stat-item"><div class="stat-num" id="metricMessages">0</div><div class="stat-label">log events</div></div>
-            <div class="stat-item"><div class="stat-num" id="metricTokens">0</div><div class="stat-label">tokens</div></div>
+      <!-- Agent log -->
+      <div class="agent-log">
+        <div class="log-header">
+          <div class="log-title">
+            <span class="log-live"></span>
+            agent communication log
+          </div>
+          <span class="log-count" id="logCount">0 events</span>
+        </div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+
+      <!-- Side panel -->
+      <div class="side-panel">
+
+        <div class="info-card">
+          <div class="info-card-header">run metrics</div>
+          <div class="info-card-body">
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-num" id="metricIterations">0</div>
+                <div class="stat-label">iterations</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num" id="metricTime">0s</div>
+                <div class="stat-label">elapsed</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num" id="metricMessages">0</div>
+                <div class="stat-label">log events</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-num" id="metricTokens">0</div>
+                <div class="stat-label">tokens</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="info-card">
-        <div class="info-card-header">node status</div>
-        <div class="info-card-body">
-          <div class="agent-legend">
-            <div class="legend-item" id="legend-supervisor" style="--agent-color:var(--supervisor)">
-              <div class="legend-dot"></div>
-              <div class="legend-info"><div class="legend-name">Supervisor</div><div class="legend-desc">LangGraph START → node</div></div>
-              <span class="legend-badge" style="background:rgba(0,212,170,.1);color:var(--supervisor);border:1px solid rgba(0,212,170,.2)">ORCH</span>
-            </div>
-            <div class="legend-item" id="legend-search" style="--agent-color:var(--search)">
-              <div class="legend-dot"></div>
-              <div class="legend-info"><div class="legend-name">Search Agent</div><div class="legend-desc">HumanMessage + SystemMessage</div></div>
-              <span class="legend-badge" style="background:rgba(77,158,255,.1);color:var(--search);border:1px solid rgba(77,158,255,.2)">TOOL</span>
-            </div>
-            <div class="legend-item" id="legend-critic" style="--agent-color:var(--critic)">
-              <div class="legend-dot"></div>
-              <div class="legend-info"><div class="legend-name">Critic Agent</div><div class="legend-desc">conditional_edge router</div></div>
-              <span class="legend-badge" style="background:rgba(255,107,107,.1);color:var(--critic);border:1px solid rgba(255,107,107,.2)">EVAL</span>
-            </div>
-            <div class="legend-item" id="legend-writer" style="--agent-color:var(--writer)">
-              <div class="legend-dot"></div>
-              <div class="legend-info"><div class="legend-name">Writer Agent</div><div class="legend-desc">LCEL: prompt | LLM | parser</div></div>
-              <span class="legend-badge" style="background:rgba(245,166,35,.1);color:var(--writer);border:1px solid rgba(245,166,35,.2)">OUT</span>
+        <div class="info-card">
+          <div class="info-card-header">node status</div>
+          <div class="info-card-body">
+            <div class="agent-legend">
+              <div class="legend-item" id="legend-supervisor" style="--agent-color:var(--supervisor)">
+                <div class="legend-dot"></div>
+                <div class="legend-info">
+                  <div class="legend-name">Supervisor</div>
+                  <div class="legend-desc">LangGraph START → node</div>
+                </div>
+                <span class="legend-badge"
+                  style="background:rgba(0,212,170,.1);color:var(--supervisor);border:1px solid rgba(0,212,170,.2)">ORCH</span>
+              </div>
+              <div class="legend-item" id="legend-search" style="--agent-color:var(--search)">
+                <div class="legend-dot"></div>
+                <div class="legend-info">
+                  <div class="legend-name">Search Agent</div>
+                  <div class="legend-desc">HumanMessage + SystemMessage</div>
+                </div>
+                <span class="legend-badge"
+                  style="background:rgba(77,158,255,.1);color:var(--search);border:1px solid rgba(77,158,255,.2)">TOOL</span>
+              </div>
+              <div class="legend-item" id="legend-critic" style="--agent-color:var(--critic)">
+                <div class="legend-dot"></div>
+                <div class="legend-info">
+                  <div class="legend-name">Critic Agent</div>
+                  <div class="legend-desc">conditional_edge router</div>
+                </div>
+                <span class="legend-badge"
+                  style="background:rgba(255,107,107,.1);color:var(--critic);border:1px solid rgba(255,107,107,.2)">EVAL</span>
+              </div>
+              <div class="legend-item" id="legend-writer" style="--agent-color:var(--writer)">
+                <div class="legend-dot"></div>
+                <div class="legend-info">
+                  <div class="legend-name">Writer Agent</div>
+                  <div class="legend-desc">LCEL: prompt | LLM | parser</div>
+                </div>
+                <span class="legend-badge"
+                  style="background:rgba(245,166,35,.1);color:var(--writer);border:1px solid rgba(245,166,35,.2)">OUT</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="info-card">
-        <div class="info-card-header">critic loop tracker</div>
-        <div class="info-card-body">
-          <div style="font-size:10px;color:var(--muted);margin-bottom:7px;font-family:var(--font-mono)">research iterations</div>
-          <div class="iteration-bar">
-            <div class="iter-dot" id="idot-0"></div>
-            <div class="iter-dot" id="idot-1"></div>
-            <div class="iter-dot" id="idot-2"></div>
-            <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-left:5px" id="iterLabel">0 / 3 max</span>
+        <div class="info-card">
+          <div class="info-card-header">critic loop tracker</div>
+          <div class="info-card-body">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:7px;font-family:var(--font-mono)">research
+              iterations</div>
+            <div class="iteration-bar">
+              <div class="iter-dot" id="idot-0"></div>
+              <div class="iter-dot" id="idot-1"></div>
+              <div class="iter-dot" id="idot-2"></div>
+              <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-left:5px"
+                id="iterLabel">0 / 3 max</span>
+            </div>
+            <div style="font-size:9px;color:var(--dim);margin-top:7px;line-height:1.5">
+              <span style="color:rgba(0,212,170,.5)">add_conditional_edges("critic", route_after_critic)</span>
+            </div>
           </div>
-          <div style="font-size:9px;color:var(--dim);margin-top:7px;line-height:1.5">
-            🟢 green = approved &nbsp; 🔴 red = rejected, looping back<br>
-            <span style="color:rgba(0,212,170,.5)">add_conditional_edges("critic", route_after_critic)</span>
-          </div>
         </div>
-      </div>
 
-    </div>
-  </div>
-
-  <!-- Result -->
-  <div class="result-section" id="resultSection" style="display:none">
-    <div class="section-label">writer agent — final report</div>
-    <div class="result-card">
-      <div class="result-header">
-        <div class="result-title">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          LangGraph pipeline complete
-        </div>
-        <div class="result-actions">
-          <button class="icon-btn" onclick="copyResult()" title="Copy markdown">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          </button>
-          <button class="icon-btn" onclick="downloadResult()" title="Download .md">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="result-body">
-        <div class="result-text" id="resultText"></div>
       </div>
     </div>
+
+    <!-- Result -->
+    <div class="result-section" id="resultSection" style="display:none">
+      <div class="section-label">writer agent — final report</div>
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-title">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            LangGraph pipeline complete
+          </div>
+          <div class="result-actions">
+            <button class="icon-btn" onclick="copyResult()" title="Copy markdown">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+              </svg>
+            </button>
+            <button class="icon-btn" onclick="downloadResult()" title="Download .md">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="result-body">
+          <div class="result-text" id="resultText"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-</div>
+  <footer>
+    built by <a href="https://github.com/shantanukumar" target="_blank">shantanu</a>
+    <a href="https://github.com/shantanukumar/research-orchestrator" target="_blank">github</a> ·
+    powered by <a href="https://ai.google.dev" target="_blank">gemini</a>
+  </footer>
 
-<footer>
-  built by <a href="https://github.com/shantanukumar" target="_blank">shantanu kumar</a> · samsung r&d ·
-  <a href="https://github.com/shantanukumar/research-orchestrator" target="_blank">github</a> ·
-  powered by <a href="https://ai.google.dev" target="_blank">gemini 2.0 flash</a>
-</footer>
-
-<script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
+
 </html>
