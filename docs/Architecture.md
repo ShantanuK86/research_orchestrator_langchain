@@ -2,7 +2,7 @@
 
 ## Overview
 
-This system implements a **supervisor multi-agent pattern** using LangGraph's `StateGraph`. A single shared state object flows through four nodes, with a conditional edge that creates an iterative critic loop before the final writer node runs.
+This system implements a **supervisor multi-agent pattern** using LangGraph's `StateGraph`. A single shared state object flows through an elite five-node squad, featuring a ruthless Fact-Checker and a conditional edge that creates an iterative critic loop before the final writer node runs.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -26,6 +26,9 @@ This system implements a **supervisor multi-agent pattern** using LangGraph's `S
 │  │  [search]  ◄────────────────────────────────────┐  │   │   │
 │  │    │       SystemMessage + HumanMessage → LLM   │  │   │   │
 │  │    │       → research_content                   │  │   │   │
+│  │    ▼                                            │  │   │   │
+│  │  [fact_check]  ChatPromptTemplate | LLM | Parser│  │   │   │
+│  │    │           → fact_check_report              │  │   │   │
 │  │    ▼                                            │  │   │   │
 │  │  [critic]      ChatPromptTemplate | LLM | Parser│  │   │   │
 │  │    │           → quality_score, approved, gaps  │  │   │   │
@@ -82,6 +85,7 @@ class ResearchState(BaseModel):
     gaps: list[str]                 = []   # critic-flagged gaps
     improvements: list[str]         = []
     critique_text: str              = ""
+    fact_check_report: str          = ""   # hallucination flags
     final_report: str               = ""
     iteration: int                  = 0
     total_tokens: int               = 0
@@ -101,12 +105,14 @@ graph = StateGraph(ResearchState)
 
 graph.add_node("supervisor", _supervisor)
 graph.add_node("search",     _search)
+graph.add_node("fact_checker", _fact_checker)
 graph.add_node("critic",     _critic)
 graph.add_node("writer",     _writer)
 
 graph.add_edge(START,        "supervisor")
 graph.add_edge("supervisor", "search")
-graph.add_edge("search",     "critic")
+graph.add_edge("search",     "fact_checker")
+graph.add_edge("fact_checker", "critic")
 graph.add_edge("writer",     END)
 
 graph.add_conditional_edges(
@@ -143,9 +149,16 @@ def route_after_critic(state: ResearchState) -> str:
 - **Temperature:** 0.7 (diverse synthesis)
 - **Context-aware:** on iteration > 1, focuses prompt on critic-flagged gaps
 
+### Fact-Checker Agent
+- **LangChain pattern:** `ChatPromptTemplate | ChatGoogleGenerativeAI | StrOutputParser`
+- **Input:** `state.topic`, `state.research_content`
+- **Output state delta:** `fact_check_report`, `total_tokens`
+- **Temperature:** 0.1 (icy-cold logic to hunt down hallucinations)
+- **Role:** Ruthlessly dissects the Search Agent's output for unsupported claims before the Critic even sees it.
+
 ### Critic Agent
 - **LangChain pattern:** `ChatPromptTemplate | ChatGoogleGenerativeAI | StrOutputParser` → `json.loads()`
-- **Input:** `state.research_content`, `state.quality_criteria`
+- **Input:** `state.research_content`, `state.quality_criteria`, `state.fact_check_report`
 - **Output state delta:** `quality_score`, `approved`, `gaps`, `improvements`, `critique_text`
 - **Temperature:** 0.2 (consistent scoring)
 - **Threshold:** configurable via `QUALITY_THRESHOLD` env var (default 7/10)
@@ -164,7 +177,7 @@ All frontend updates arrive as SSE lines: `data: <json>\n\n`
 
 ```typescript
 interface AgentEvent {
-  agent:    "supervisor" | "search" | "critic" | "writer" | "system";
+  agent:    "supervisor" | "search" | "fact_checker" | "critic" | "writer" | "system";
   type:     "log" | "status" | "metric" | "score" | "result" | "thought";
   message:  string;
   thinking: boolean;
