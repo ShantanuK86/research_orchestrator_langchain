@@ -13,21 +13,24 @@
 
 ## why this exists
 
-Most "AI research tools" are just one big prompt. They hallucinate, miss contradictions, and confidently produce garbage.
+Most "AI research tools" are just one big mega-prompt. They hallucinate, miss contradictions, and confidently produce absolute garbage.
 
-This system uses a real **LangGraph StateGraph** where four agents actually check each other's work in a loop:
+I wanted to build something better. This system uses a real **LangGraph StateGraph** where *five* specialized agents relentlessly check each other's work in a loop until the output is bulletproof:
 
-```
+```text
 START
   │
   ▼
 Supervisor ──────────────────────────────────────────────────┐
   │  builds plan, sets search angles                         │
   ▼                                                          │
-Search Agent                                                 │
+Search Agent ◄───────────────────────────────────────────────┤
   │  synthesizes knowledge via LangChain messages            │
   ▼                                                          │
-Critic Agent ──── score < 7 ──► back to Search (with gaps)  │
+Fact-Checker ────────────────────────────────────────────────┤
+  │  ruthlessly hunts down hallucinations & flags bad claims │
+  ▼                                                          │
+Critic Agent ──── score < 7 ──► back to Search (with gaps)   │
   │                                                          │
   │  score ≥ 7                                               │
   ▼                                                          │
@@ -71,6 +74,7 @@ research_orchestrator_langchain/
 │   ├── agents/
 │   │   ├── supervisor.py           # ChatPromptTemplate | Gemini | StrOutputParser
 │   │   ├── search_agent.py         # [SystemMessage, HumanMessage] → llm.ainvoke()
+│   │   ├── fact_checker.py         # The hallucination hunter!
 │   │   ├── critic.py               # LCEL chain → JSON quality score
 │   │   └── writer.py               # LCEL chain → final Markdown report
 │   │
@@ -140,12 +144,14 @@ Open `http://localhost:8000`.
 graph = StateGraph(ResearchState)
 graph.add_node("supervisor", _supervisor)
 graph.add_node("search",     _search)
+graph.add_node("fact_checker", _fact_checker)
 graph.add_node("critic",     _critic)
 graph.add_node("writer",     _writer)
 
 graph.add_edge(START,        "supervisor")
 graph.add_edge("supervisor", "search")
-graph.add_edge("search",     "critic")
+graph.add_edge("search",     "fact_checker")
+graph.add_edge("fact_checker", "critic")
 graph.add_edge("writer",     END)
 
 # The key bit — conditional routing after critic
@@ -232,7 +238,7 @@ web: uvicorn main:app --host 0.0.0.0 --port $PORT
 - [ ] LangSmith tracing — one env var: `LANGCHAIN_TRACING_V2=true`
 - [ ] Token streaming from Writer via `llm.astream()`
 - [ ] `MemorySaver` checkpointing for persistent run history
-- [ ] Fifth node: Fact-Checker between Search and Critic
+- [x] Fifth node: Fact-Checker between Search and Critic (Shipped! 🚀)
 - [ ] Export report as PDF
 
 ---
