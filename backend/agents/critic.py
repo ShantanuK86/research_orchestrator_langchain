@@ -11,6 +11,7 @@ from backend.core.config import GEMINI_MODEL, QUALITY_THRESHOLD
 
 SYSTEM = """You are the Critic Agent in a LangGraph research pipeline.
 Rigorously evaluate research content for quality, accuracy, and completeness.
+Pay close attention to the Fact-Check Report. If the Fact-Checker flagged unsupported claims or hallucinations, you MUST penalize the score and reject the content.
 
 Respond ONLY in this exact JSON (no markdown fences):
 {{
@@ -30,7 +31,7 @@ Scoring:
 prompt = ChatPromptTemplate.from_messages([
     ("system", SYSTEM),
     ("human",
-     "Topic: {topic}\nQuality criteria: {criteria}\n\nResearch to evaluate:\n{content}"),
+     "Topic: {topic}\nQuality criteria: {criteria}\n\nFact-Check Report:\n{fact_check_report}\n\nResearch to evaluate:\n{content}"),
 ])
 
 async def critic_node(state: ResearchState, api_key: str) -> dict:
@@ -43,6 +44,7 @@ async def critic_node(state: ResearchState, api_key: str) -> dict:
     raw = await chain.ainvoke({
         "topic": state.topic,
         "criteria": ", ".join(state.quality_criteria),
+        "fact_check_report": state.fact_check_report,
         "content": state.research_content,
     })
     raw = raw.replace("```json", "").replace("```", "").strip()

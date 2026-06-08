@@ -114,6 +114,22 @@
           <!-- Arrow 1 -->
           <div class="graph-arrow">
             <div class="arrow-line" id="arrow-1"></div>
+            <div class="arrow-label">fact-check</div>
+          </div>
+
+          <!-- Fact-Checker node -->
+          <div class="gnode" id="node-fact_checker" style="--nc:var(--fact_checker)">
+            <div class="gnode-icon">🛡️</div>
+            <div class="gnode-pulse"></div>
+            <div class="gnode-name">FACT-CHECKER</div>
+            <div class="gnode-role">Verifies facts and<br>flags hallucinations</div>
+            <span class="gnode-status" id="status-fact_checker">idle</span>
+            <div class="gnode-iter" id="iter-fact_checker"></div>
+          </div>
+
+          <!-- Arrow 2 -->
+          <div class="graph-arrow">
+            <div class="arrow-line" id="arrow-2"></div>
             <div class="arrow-label">evaluate</div>
           </div>
 
@@ -129,9 +145,9 @@
             <div class="score-rings" id="scoreRings"></div>
           </div>
 
-          <!-- Arrow 2 -->
+          <!-- Arrow 3 -->
           <div class="graph-arrow">
-            <div class="arrow-line" id="arrow-2"></div>
+            <div class="arrow-line" id="arrow-3"></div>
             <div class="arrow-label">approved</div>
           </div>
 
@@ -219,6 +235,15 @@
                 </div>
                 <span class="legend-badge"
                   style="background:rgba(77,158,255,.1);color:var(--search);border:1px solid rgba(77,158,255,.2)">TOOL</span>
+              </div>
+              <div class="legend-item" id="legend-fact_checker" style="--agent-color:var(--fact_checker)">
+                <div class="legend-dot"></div>
+                <div class="legend-info">
+                  <div class="legend-name">Fact-Checker Agent</div>
+                  <div class="legend-desc">Validates search content</div>
+                </div>
+                <span class="legend-badge"
+                  style="background:rgba(155,81,224,.1);color:var(--fact_checker);border:1px solid rgba(155,81,224,.2)">VERIFY</span>
               </div>
               <div class="legend-item" id="legend-critic" style="--agent-color:var(--critic)">
                 <div class="legend-dot"></div>

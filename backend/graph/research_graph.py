@@ -17,6 +17,7 @@ from backend.core.models import ResearchState
 from backend.agents.supervisor import supervisor_node
 from backend.agents.search_agent import search_node
 from backend.agents.critic import critic_node
+from backend.agents.fact_checker import fact_checker_node
 from backend.agents.writer import writer_node
 from backend.core.config import MAX_ITERATIONS
 
@@ -44,6 +45,9 @@ def build_graph(api_key: str):
     async def _critic(state: ResearchState) -> dict:
         return await critic_node(state, api_key)
 
+    async def _fact_checker(state: ResearchState) -> dict:
+        return await fact_checker_node(state, api_key)
+
     async def _writer(state: ResearchState) -> dict:
         return await writer_node(state, api_key)
 
@@ -59,13 +63,15 @@ def build_graph(api_key: str):
 
     graph.add_node("supervisor", _supervisor)
     graph.add_node("search",     _search)
+    graph.add_node("fact_checker", _fact_checker)
     graph.add_node("critic",     _critic)
     graph.add_node("writer",     _writer)
 
     # Edges
     graph.add_edge(START,        "supervisor")
     graph.add_edge("supervisor", "search")
-    graph.add_edge("search",     "critic")
+    graph.add_edge("search",     "fact_checker")
+    graph.add_edge("fact_checker", "critic")
     graph.add_edge("writer",     END)
 
     # Conditional edge — the core LangGraph routing logic

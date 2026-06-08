@@ -32,6 +32,7 @@ class ResearchState(BaseModel):
     gaps: list[str]                 = []
     improvements: list[str]         = []
     critique_text: str              = ""
+    fact_check_report: str          = ""
     final_report: str               = ""
     iteration: int                  = 0
     total_tokens: int               = 0

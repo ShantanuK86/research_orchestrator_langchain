@@ -3,10 +3,11 @@
  */
 
 export const AGENT_STYLES = {
-  supervisor: { bg:'rgba(0,212,170,0.1)',  color:'#00d4aa', label:'SUPERVISOR' },
-  search:     { bg:'rgba(77,158,255,0.1)', color:'#4d9eff', label:'SEARCH'     },
-  critic:     { bg:'rgba(255,107,107,0.1)',color:'#ff6b6b', label:'CRITIC'     },
-  writer:     { bg:'rgba(245,166,35,0.1)', color:'#f5a623', label:'WRITER'     },
+  supervisor:   { bg:'rgba(0,212,170,0.1)',  color:'#00d4aa', label:'SUPERVISOR' },
+  search:       { bg:'rgba(77,158,255,0.1)', color:'#4d9eff', label:'SEARCH'     },
+  fact_checker: { bg:'rgba(155,81,224,0.1)', color:'#9b51e0', label:'FACT-CHECKER' },
+  critic:       { bg:'rgba(255,107,107,0.1)',color:'#ff6b6b', label:'CRITIC'     },
+  writer:       { bg:'rgba(245,166,35,0.1)', color:'#f5a623', label:'WRITER'     },
   system:     { bg:'rgba(255,255,255,0.05)',color:'#6b7a8d',label:'SYS'        },
 };
 
@@ -44,7 +45,7 @@ export function resetUI() {
     const d = el(`idot-${i}`);
     if (d) d.className = 'iter-dot';
   }
-  ['supervisor','search','critic','writer'].forEach(a => {
+  ['supervisor','search','fact_checker','critic','writer'].forEach(a => {
     setNodeState(a,'idle'); setLegendActive(a,false);
     const it = el('iter-'+a); if(it) it.textContent='';
   });
@@ -110,7 +111,7 @@ export function setLegendActive(agent, active) {
 
 export function activateArrow(from, to) {
   // map node pair → arrow index
-  const map = { 'supervisor-search':0, 'search-critic':1, 'critic-writer':2 };
+  const map = { 'supervisor-search':0, 'search-fact_checker':1, 'fact_checker-critic':2, 'critic-writer':3 };
   const key = `${from}-${to}`;
   document.querySelectorAll('.arrow-line').forEach(a => a.classList.remove('active'));
   const idx = map[key];
